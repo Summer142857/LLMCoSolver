@@ -7,7 +7,7 @@ This repository contains the official implementation of the paper **"Large Langu
 
 ## 📖 Abstract
 
-This work explores the potential of Large Language Models (LLMs) as end-to-end solvers for combinatorial optimization problems. We investigate how LLMs can be effectively applied to solve complex optimization challenges without requiring specialized algorithmic knowledge or domain-specific heuristics.
+Combinatorial optimization (CO) problems, central to decision-making scenarios like logistics and manufacturing, are traditionally solved using problem-specific algorithms requiring significant domain expertise. While large language models (LLMs) have shown promise in automating CO problem solving, existing approaches rely on intermediate steps such as code generation or solver invocation, limiting their generality and accessibility. This paper introduces a novel framework that empowers LLMs to serve as end-to-end CO solvers by directly mapping natural language problem descriptions to solutions. We propose a two-stage training strategy: supervised fine-tuning (SFT) imparts LLMs with solution construction patterns from domain-specific solvers, while a feasibility-and-optimality-aware reinforcement learning (FOARL) process explicitly mitigates constraint violations and refines solution quality. Evaluation across seven NP-hard CO problems shows that our method achieves a high feasibility rate and reduces the average optimality gap to 1.03–8.20% by tuning a 7B-parameter LLM, surpassing both general-purpose LLMs (e.g., GPT-4o), reasoning models (e.g., DeepSeek-R1), and domain-specific heuristics. Our method establishes a unified language-based pipeline for CO without extensive code execution or manual architectural adjustments for different problems, offering a general and language-driven alternative to traditional solver design while maintaining relative feasibility guarantees.
 
 ## 📰 Paper
 
@@ -71,9 +71,6 @@ url={https://openreview.net/forum?id=qr5uMEs6iR}
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📞 Contact
-
-For questions and inquiries about this work, please contact the authors through the paper's OpenReview forum or create an issue in this repository.
 
 ## 🔔 Updates
 
