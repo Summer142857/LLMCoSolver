@@ -17,7 +17,7 @@ Combinatorial optimization (CO) problems, central to decision-making scenarios l
 
 **Conference:** The Thirty-ninth Annual Conference on Neural Information Processing Systems (NeurIPS 2025)
 
-**Paper Link:** [OpenReview](https://openreview.net/forum?id=qr5uMEs6iR)
+**Paper Link:** [OpenReview](https://arxiv.org/abs/2509.16865)
 
 ## 🚀 Code Release Status
 
