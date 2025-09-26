@@ -5,9 +5,9 @@
 
 This repository contains the official implementation of the paper **"Large Language Models as End-to-end Combinatorial Optimization Solvers"** presented at The Thirty-ninth Annual Conference on Neural Information Processing Systems (NeurIPS 2025).
 
-## 📖 Abstract
+## 📖 TL; DR
 
-Combinatorial optimization (CO) problems, central to decision-making scenarios like logistics and manufacturing, are traditionally solved using problem-specific algorithms requiring significant domain expertise. While large language models (LLMs) have shown promise in automating CO problem solving, existing approaches rely on intermediate steps such as code generation or solver invocation, limiting their generality and accessibility. This paper introduces a novel framework that empowers LLMs to serve as end-to-end CO solvers by directly mapping natural language problem descriptions to solutions. We propose a two-stage training strategy: supervised fine-tuning (SFT) imparts LLMs with solution construction patterns from domain-specific solvers, while a feasibility-and-optimality-aware reinforcement learning (FOARL) process explicitly mitigates constraint violations and refines solution quality. Evaluation across seven NP-hard CO problems shows that our method achieves a high feasibility rate and reduces the average optimality gap to 1.03–8.20% by tuning a 7B-parameter LLM, surpassing both general-purpose LLMs (e.g., GPT-4o), reasoning models (e.g., DeepSeek-R1), and domain-specific heuristics. Our method establishes a unified language-based pipeline for CO without extensive code execution or manual architectural adjustments for different problems, offering a general and language-driven alternative to traditional solver design while maintaining relative feasibility guarantees.
+A framework for training Large Language Models (LLMs) to solve combinatorial optimization problems using supervised fine-tuning (SFT) followed by reinforcement learning (RL).
 
 ## 📰 Paper
 
@@ -17,36 +17,141 @@ Combinatorial optimization (CO) problems, central to decision-making scenarios l
 
 **Conference:** The Thirty-ninth Annual Conference on Neural Information Processing Systems (NeurIPS 2025)
 
-**Paper Link:** [arxiv](https://arxiv.org/abs/2509.16865)
+**Paper Link:** [Arxiv](https://arxiv.org/abs/2509.16865)
 
-## 🚀 Code Release Status
+## 🚀 Overview
 
-**The complete code implementation will be released soon.** This repository is currently being prepared for the official code release following the paper publication.
+It now supports training and evaluation on multiple combinatorial optimization problems:
+- **TSP** (Traveling Salesman Problem)
+- **CVRP** (Capacitated Vehicle Routing Problem) 
+- **OP** (Orienteering Problem)
+- **MVC** (Minimum Vertex Cover)
+- **MIS** (Maximum Independent Set)
+- **PFSP** (Permutation Flow Shop Problem)
+- **JSSP** (Job Shop Scheduling Problem)
 
-## 📋 Repository Structure
+## 🔔 Data Format
 
+Place your training and evaluation data in the following structure:
 ```
-LLMCoSolver/
-├── README.md          # This file
-├── LICENSE           # MIT License
-└── [Coming Soon]     # Complete implementation
+data/
+├── <problem_name>/
+│   ├── train/           # Training data
+│   ├── eval/            # Evaluation data  
+│   └── instances.pkl    # Problem instances
 ```
 
-## 🛠️ Installation
 
-*Installation instructions will be provided with the code release.*
+## 💻 Training Pipeline
 
-## 💻 Usage
+The training consists of three main stages:
 
-*Usage examples and tutorials will be available with the code release.*
+### 1. Supervised Fine-Tuning (SFT)
 
-## 🧪 Experiments
+First, train the model using supervised learning on problem-specific data:
 
-*Experimental setup, datasets, and reproduction scripts will be included with the code release.*
+```bash
+python main_train.py --problem <problem_name> [options]
+```
 
-## 📊 Results
+**Key parameters:**
+- `--problem`: Problem type (tsp, cvrp, op, mvc, mis, pfsp, jssp)
+- `--model_name`: Base model to fine-tune (default: unsloth/Qwen2.5-7B)
+- `--max_seq_length`: Maximum sequence length (default: 20000)
+- `--per_device_train_batch_size`: Batch size per device (default: 4)
+- `--num_train_epochs`: Number of training epochs (default: 1)
+- `--learning_rate`: Learning rate (default: 2e-4)
+- `--lora_r`: LoRA rank (default: 64)
+- `--lora_alpha`: LoRA alpha (default: 64)
 
-*Detailed results, benchmarks, and performance comparisons will be documented with the code release.*
+**Example:**
+```bash
+python main_train.py --problem cvrp --num_train_epochs 1 --per_device_train_batch_size 4
+```
+
+### 2. Reinforcement Learning (RL)
+
+After SFT, improve the model using reinforcement learning (GRPO):
+
+```bash
+python rl_train.py --problem <problem_name> --model_name <sft_checkpoint_path> [options]
+```
+
+**Key parameters:**
+- `--model_name`: Path to SFT checkpoint (e.g., `output_alpha64_r64_cvrp_gamma_train_embed_tok_False_seq20000_b4_ep1/checkpoint-31250`)
+- `--num_generations`: Number of generations for GRPO (default: 8)
+- `--beta`: KL coefficient (default: 0.05)
+- `--learning_rate`: Learning rate (default: 1e-6)
+- `--max_prompt_length`: Maximum prompt length (default: 20000)
+- `--max_completion_length`: Maximum completion length (default: 1000)
+
+**Example:**
+```bash
+python rl_train.py --problem cvrp --model_name output_alpha64_r64_cvrp_gamma_train_embed_tok_False_seq20000_b4_ep1/checkpoint-31250
+```
+
+### 3. Model Merging
+
+After training, merge the LoRA weights with the base model:
+
+1. Edit `cmd.sh` to specify your model checkpoint path:
+   ```bash
+   MODEL_DIR="./path/to/your/checkpoint"
+   ```
+
+2. Run the merge script:
+   ```bash
+   bash cmd.sh
+   ```
+
+This creates a `saved_models/` directory with the merged model.
+
+## 🧪 Evaluation
+
+Evaluate the trained model using two methods:
+
+### Vanilla Evaluation
+```bash
+python eval.py --model_id saved_models --problem <problem_name> --eval_method vanilla --num_samples 100
+```
+
+### Best-of-N Evaluation
+```bash
+python eval.py --model_id saved_models --problem <problem_name> --eval_method best_of_n --num_samples 100 --best_of_n 8 --temperature 0.7
+```
+
+**Evaluation parameters:**
+- `--model_id`: Path to the merged model (default: saved_models)
+- `--eval_method`: Evaluation method (vanilla or best_of_n)
+- `--num_samples`: Number of test instances to evaluate
+- `--best_of_n`: Number of solutions to generate per instance (for best_of_n)
+- `--temperature`: Sampling temperature
+- `--batch_size`: Batch size for evaluation
+
+### Output Metrics
+
+The evaluation provides:
+- **Feasibility Rate**: Percentage of valid solutions
+- **Optimality Gap**: Average gap from optimal/reference solutions  
+
+## 📊 Quick Start Example
+
+Here's a complete example for training on CVRP:
+
+```bash
+# 1. Supervised Fine-Tuning
+python main_train.py --problem cvrp --num_train_epochs 1
+
+# 2. Reinforcement Learning  
+python rl_train.py --problem cvrp --model_name output_alpha64_r64_cvrp_gamma_train_embed_tok_False_seq20000_b4_ep1/checkpoint-31250
+
+# 3. Merge Model (edit MODEL_DIR in cmd.sh first)
+bash cmd.sh
+
+# 4. Evaluate
+python eval.py --model_id saved_models --problem cvrp --eval_method vanilla --num_samples 100
+```
+
 
 ## 🤝 Contributing
 
@@ -71,12 +176,3 @@ url={https://openreview.net/forum?id=qr5uMEs6iR}
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-
-## 🔔 Updates
-
-- **2025-01**: Repository created, code release coming soon
-- Stay tuned for updates on the complete implementation!
-
----
-
-*This repository is actively maintained and the code will be released following the paper publication.*
