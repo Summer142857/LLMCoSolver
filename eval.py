@@ -424,13 +424,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# llama-8b-time:
-# tsp: [6.5s, 10.3s]
-# op: [5.7s, 7.2s]
-# mvc: [3.6s, 6.2s]
-# cvrp: [5.7s, 10.5s]
-# mis: [3.1s, 4.3s]
-# pfsp: [2.8s]
-
-# 95000
