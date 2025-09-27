@@ -638,8 +638,6 @@ def train_model(args):
         loftq_config=args.loftq_config
     )
     
-    # response_template = " ### Response:"
-    # collator = DataCollatorForCompletionOnlyLM(response_template, tokenizer=tokenizer)
 
     collator = SafeDataCollatorForCompletionOnlyLM(
         response_template="### Response:", 
@@ -700,6 +698,4 @@ def train_model(args):
 if __name__ == "__main__":
     args = parse_args()
     train_model(args)
-
-# srun -n 1 -p gpu_h100 -t 00:10:00 --gpus-per-node 1 --pty /bin/bash
 
