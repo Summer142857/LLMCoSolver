@@ -32,7 +32,10 @@ It now supports training and evaluation on multiple combinatorial optimization p
 
 ## 🔔 Data Format
 
-You can generate your own data through the problem-specific environments under /Envs/, or use the data generated in the original paper: https://drive.google.com/drive/folders/1bE1coGUa00gfuMkPXnfvldi1-WHGNnEb?usp=sharing
+You can generate your own data through the problem-specific environments under /Envs/, or use the data generated in the original paper: 
+
+- **SFT DATA**: https://drive.google.com/drive/folders/1bE1coGUa00gfuMkPXnfvldi1-WHGNnEb?usp=sharing
+- **RL DATA**: https://drive.google.com/drive/folders/1VN9crftdW7DTsMQupbc06u6PzRT-Bwnx?usp=sharing
 
 Place your training and evaluation data in the following structure:
 ```
