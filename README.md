@@ -173,7 +173,7 @@ title={Large Language Models as End-to-end Combinatorial Optimization Solvers},
 author={Xia Jiang, Yaoxin Wu, Minshuo Li, Zhiguang Cao, Yingqian Zhang},
 booktitle={The Thirty-ninth Annual Conference on Neural Information Processing Systems},
 year={2025},
-url={https://openreview.net/forum?id=qr5uMEs6iR}
+url={https://arxiv.org/abs/2509.16865}
 }
 ```
 
